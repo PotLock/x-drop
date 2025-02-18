@@ -1,17 +1,16 @@
 "use client"
 
-import { useState } from "react"
-import { signIn, useSession } from "next-auth/react"
+import { useState, useEffect } from "react"
+import { signIn } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import * as z from "zod"
-
 import { Button } from "@/components/ui/button"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { useToast } from "@/components/ui/use-toast"
-import { useEffect } from "react"
+import { useAuth } from "@/app/lib/auth"
 
 const formSchema = z.object({
   username: z.string().min(1, "Username is required"),
@@ -20,46 +19,52 @@ const formSchema = z.object({
 
 export default function LoginPage() {
   const router = useRouter()
-  const { data: session } = useSession()
+  const { isAuthenticated } = useAuth()
   const { toast } = useToast()
   const [isLoading, setIsLoading] = useState(false)
 
-  useEffect(() => {
-    if (session) {
-      router.push("/dashboard")
-    }
-  }, [session, router])
-
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      username: "",
-      password: "",
-    },
+    defaultValues: { username: "", password: "" },
   })
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
-    setIsLoading(true)
-    const result = await signIn("credentials", {
-      username: values.username,
-      password: values.password,
-      redirect: false,
-    })
+  useEffect(() => {
+    if (isAuthenticated) {
+      router.push("/")
+    }
+  }, [isAuthenticated, router])
 
-    if (result?.error) {
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    try {
+      setIsLoading(true)
+      const result = await signIn("credentials", {
+        ...values,
+        redirect: false,
+      })
+
+      if (result?.error) {
+        toast({
+          title: "Error",
+          description: "Invalid credentials",
+          variant: "destructive",
+        })
+      } else {
+        router.push("/")
+        router.refresh()
+      }
+    } catch (error) {
       toast({
         title: "Error",
-        description: "Invalid credentials",
+        description: "An error occurred during sign in",
         variant: "destructive",
       })
-    } else {
-      router.push("/dashboard")
+    } finally {
+      setIsLoading(false)
     }
-    setIsLoading(false)
   }
 
-  if (session) {
-    return null // or a loading spinner
+  if (isAuthenticated) {
+    return null
   }
 
   return (
@@ -70,32 +75,22 @@ export default function LoginPage() {
         </div>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="mt-8 space-y-6">
-            <FormField
-              control={form.control}
-              name="username"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Username</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="password"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Password</FormLabel>
-                  <FormControl>
-                    <Input type="password" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            {["username", "password"].map((field) => (
+              <FormField
+                key={field}
+                control={form.control}
+                name={field as "username" | "password"}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{field.charAt(0).toUpperCase() + field.slice(1)}</FormLabel>
+                    <FormControl>
+                      <Input {...field} type={field === "password" ? "password" : "text"} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            ))}
             <Button type="submit" className="w-full" disabled={isLoading}>
               {isLoading ? "Signing in..." : "Sign in"}
             </Button>

@@ -11,18 +11,24 @@ const handler = NextAuth({
       },
       async authorize(credentials) {
         if (credentials?.username === "admin" && credentials?.password === "password") {
-          return { id: "1", name: "Admin" }
+          return { id: "1", name: "Admin", email: "admin@example.com" }
         }
         return null
       },
     }),
   ],
-  pages: {
-    signIn: "/login",
+  callbacks: {
+    async jwt({ token, user }) {
+      if (user) token.id = user.id
+      return token
+    },
+    async session({ session, token }) {
+      if (session.user) session.user.id = token.id as string
+      return session
+    },
   },
-  session: {
-    strategy: "jwt",
-  },
+  pages: { signIn: "/login" },
+  session: { strategy: "jwt" },
 })
 
 export { handler as GET, handler as POST }
