@@ -1,15 +1,11 @@
 "use client"
-
-import { useAuth } from "@/app/lib/auth"
+import { useContractInteraction } from "@/hooks/useContractInteraction";
 
 export default function Home() {
-  const { session, isLoading } = useAuth()
-
-  if (isLoading) return <div>Loading...</div>
-
+  const { isLoggedIn, currentAccountId } = useContractInteraction();
   return (
     <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">Welcome, {session?.user?.name}</h1>
+      <h1 className="text-2xl font-bold mb-4">Welcome, {currentAccountId}</h1>
       <p>You are logged in to the admin dashboard.</p>
     </div>
   )
