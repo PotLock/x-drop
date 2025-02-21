@@ -14,7 +14,12 @@ export default function Home() {
   const handleWithdraw = (amount: number) => {
     console.log(`Withdraw ${amount} BTC`); // Replace with actual withdraw logic
   };
-
+// Step 1 : Create btc wallet from generate address near kdf
+// step 2 : store btc wallet in database
+// step 3 : add deposit BTC
+// step 4 : create near account then store with receipt twitter ID
+// step 5 : check balance wih amount before create droplink 
+// step 6 : when user go to drop url then check twitter ID and drop ID
   return (
     <div className="container mx-auto p-6">
       {isLoggedIn ? (
