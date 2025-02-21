@@ -1,0 +1,1 @@
+/Users/mac/dev/x-drop/contract/target/wasm32-unknown-unknown/release/contract.wasm: /Users/mac/dev/x-drop/contract/src/bitcoin_tx.rs /Users/mac/dev/x-drop/contract/src/ecdsa.rs /Users/mac/dev/x-drop/contract/src/external.rs /Users/mac/dev/x-drop/contract/src/lib.rs /Users/mac/dev/x-drop/contract/src/utils.rs /Users/mac/dev/x-drop/contract/target/near/contract_abi.zst

@@ -1,0 +1,12 @@
+/Users/mac/dev/x-drop/contract/target/wasm32-unknown-unknown/release/deps/libborsh-cd06969fb86dca3d.rmeta: /Users/mac/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/borsh-1.5.3/src/lib.rs /Users/mac/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/borsh-1.5.3/src/de/mod.rs /Users/mac/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/borsh-1.5.3/src/de/hint.rs /Users/mac/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/borsh-1.5.3/src/ser/mod.rs /Users/mac/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/borsh-1.5.3/src/ser/helpers.rs /Users/mac/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/borsh-1.5.3/src/error.rs
+
+/Users/mac/dev/x-drop/contract/target/wasm32-unknown-unknown/release/deps/libborsh-cd06969fb86dca3d.rlib: /Users/mac/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/borsh-1.5.3/src/lib.rs /Users/mac/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/borsh-1.5.3/src/de/mod.rs /Users/mac/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/borsh-1.5.3/src/de/hint.rs /Users/mac/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/borsh-1.5.3/src/ser/mod.rs /Users/mac/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/borsh-1.5.3/src/ser/helpers.rs /Users/mac/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/borsh-1.5.3/src/error.rs
+
+/Users/mac/dev/x-drop/contract/target/wasm32-unknown-unknown/release/deps/borsh-cd06969fb86dca3d.d: /Users/mac/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/borsh-1.5.3/src/lib.rs /Users/mac/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/borsh-1.5.3/src/de/mod.rs /Users/mac/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/borsh-1.5.3/src/de/hint.rs /Users/mac/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/borsh-1.5.3/src/ser/mod.rs /Users/mac/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/borsh-1.5.3/src/ser/helpers.rs /Users/mac/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/borsh-1.5.3/src/error.rs
+
+/Users/mac/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/borsh-1.5.3/src/lib.rs:
+/Users/mac/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/borsh-1.5.3/src/de/mod.rs:
+/Users/mac/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/borsh-1.5.3/src/de/hint.rs:
+/Users/mac/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/borsh-1.5.3/src/ser/mod.rs:
+/Users/mac/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/borsh-1.5.3/src/ser/helpers.rs:
+/Users/mac/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/borsh-1.5.3/src/error.rs:
