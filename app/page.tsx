@@ -1,13 +1,16 @@
 "use client"
 import { useContractInteraction } from "@/hooks/useContractInteraction";
 import Link from "next/link";
-import Balance from "@/app/components/Balance";
-import Deposit from "@/app/components/Deposit";
-import Withdraw from "@/app/components/Withdraw";
+import Balance from "@/components/Balance";
+import Deposit from "@/components/Deposit";
+import Withdraw from "@/components/Withdraw";
 import { Button } from "@/components/ui/button";
+import { useUserQuery } from "@/hooks/useQuery";
 
 export default function Home() {
   const { isLoggedIn, currentAccountId } = useContractInteraction();
+  const { data: user, isLoading, isError } = useUserQuery(currentAccountId||"");
+  console.log(user)
   const balance = 1.2345; // Replace with actual balance fetching logic
   const depositAddress = "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa"; // Replace with actual deposit address
 

@@ -1,6 +1,6 @@
 "use client"
 
-import CreateDropLink from "@/app/components/create-drop-link";
+import CreateDropLink from "@/components/create-drop-link";
 import Link from "next/link";
 
 export default function CreateDropLinkPage() {

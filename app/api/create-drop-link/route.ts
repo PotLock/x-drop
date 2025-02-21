@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import * as nearAPI from 'near-api-js';
-import { generateAddress } from '@/app/lib/kdf'; // Assuming you have this utility function
-import { getAccount, contractCall } from '@/app/lib/near-provider'; // Adjust the import path as needed
+import { generateAddress } from '@/lib/kdf'; // Assuming you have this utility function
+import { getAccount, contractCall } from '@/lib/near-provider'; // Adjust the import path as needed
 import dotenv from 'dotenv';
 
 dotenv.config();

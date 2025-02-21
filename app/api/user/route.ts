@@ -1,5 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import dotenv from 'dotenv';
+import { generateAddress } from "@/lib/kdf";
+
+dotenv.config();
+
+const {
+  REACT_APP_contractId: contractId,
+  REACT_APP_MPC_PUBLIC_KEY: MPC_PUBLIC_KEY,
+  REACT_APP_MPC_PATH: MPC_PATH,
+} = process.env;
+
 
 // GET user by address
 export async function GET(req: NextRequest) {
@@ -32,9 +43,17 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const { address } = body;
 
+
     if (!address) {
       return NextResponse.json({ error: "Address is required" }, { status: 400 });
     }
+
+    const { address: btcAddress, publicKey: btcPublicKey } = await generateAddress({
+      publicKey: MPC_PUBLIC_KEY,
+      accountId: contractId,
+      path: MPC_PATH,
+      chain: 'bitcoin',
+    });
     
     // Check if user already exists
     const existingUser = await prisma.user.findUnique({
@@ -51,6 +70,8 @@ export async function POST(req: NextRequest) {
     const newUser = await prisma.user.create({
       data: {
         address: address,
+        btcAddress: btcAddress,
+        btcPublicKey: btcPublicKey
       },
     });
 
@@ -65,7 +86,7 @@ export async function POST(req: NextRequest) {
 export async function PUT(req: NextRequest) {
   try {
     const body = await req.json();
-    const { address, displayOrder, ...otherUpdates } = body;
+    const { address, ...otherUpdates } = body;
 
     if (!address) {
       return NextResponse.json({ error: "Address is required" }, { status: 400 });
@@ -82,13 +103,8 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    // Prepare update data
-    const updateData = {
-      ...(displayOrder !== undefined && { displayOrder }),
-      ...otherUpdates,
-    };
-
-    if (Object.keys(updateData).length === 0) {
+    // Update user if there are any updates
+    if (Object.keys(otherUpdates).length === 0) {
       return NextResponse.json({ error: "No updates provided" }, { status: 400 });
     }
 
@@ -97,7 +113,7 @@ export async function PUT(req: NextRequest) {
       where: {
         address: address,
       },
-      data: updateData,
+      data: otherUpdates,
     });
 
     return NextResponse.json(updatedUser);
