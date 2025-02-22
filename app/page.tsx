@@ -25,7 +25,7 @@ export default function Home() {
 // step 6 : when user go to drop url then check twitter ID and drop ID
   return (
     <div className="container mx-auto p-6">
-      {isLoggedIn ? (
+      {isLoggedIn && currentAccountId? (
         <>
           <div className="bg-white shadow-md rounded-lg p-6 mb-6">
             <div className="flex justify-between items-center mb-4">

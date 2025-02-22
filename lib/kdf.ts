@@ -1,5 +1,5 @@
 import { base_encode, base_decode } from 'near-api-js/lib/utils/serialize.js';
-import * as EC from 'elliptic';
+import { ec as EC } from 'elliptic';
 import { sha3_256 } from 'js-sha3';
 import hash from 'hash.js';
 import bs58check from 'bs58check';
@@ -16,9 +16,7 @@ export async function deriveChildPublicKey(
     signerId: any,
     path = '',
 ) {
-    const ec = EC.default
-        ? new EC.default.ec('secp256k1')
-        : new EC.ec('secp256k1');
+    const ec = new EC('secp256k1');
     const scalarHex = sha3_256(
         `near-mpc-recovery v0.1.0 epsilon derivation:${signerId},${path}`,
     );
@@ -40,8 +38,8 @@ export async function deriveChildPublicKey(
 }
 
 export async function uncompressedHexPointToBtcAddress(
-    uncompressedHexPoint,
-    networkByte,
+    uncompressedHexPoint: any,
+    networkByte: any,
 ) {
     // Step 1: SHA-256 hashing of the public key
     const publicKeyBytes = Uint8Array.from(
@@ -68,7 +66,7 @@ export async function uncompressedHexPointToBtcAddress(
     return bs58check.encode(networkByteAndRipemd160);
 }
 
-export async function generateBtcAddress({ childPublicKey, isTestnet = true }) {
+export async function generateBtcAddress({ childPublicKey, isTestnet = true }: { childPublicKey: string, isTestnet?: boolean }) {
     const networkByte = Buffer.from([isTestnet ? 0x6f : 0x00]); // 0x00 for mainnet, 0x6f for testnet
     const address = await uncompressedHexPointToBtcAddress(
         childPublicKey,
@@ -77,7 +75,7 @@ export async function generateBtcAddress({ childPublicKey, isTestnet = true }) {
     return address;
 }
 
-function uncompressedHexPointToEvmAddress(uncompressedHexPoint) {
+function uncompressedHexPointToEvmAddress(uncompressedHexPoint: any) {
     // console.log('uncompressedHexPoint', uncompressedHexPoint);
 
     const address = keccak('keccak256')
@@ -88,7 +86,7 @@ function uncompressedHexPointToEvmAddress(uncompressedHexPoint) {
     return '0x' + address.substring(address.length - 40);
 }
 
-async function uncompressedHexPointToNearImplicit(uncompressedHexPoint) {
+async function uncompressedHexPointToNearImplicit(uncompressedHexPoint: any) {
     // console.log('uncompressedHexPoint', uncompressedHexPoint);
 
     const implicitSecpPublicKey =
@@ -123,7 +121,7 @@ async function uncompressedHexPointToNearImplicit(uncompressedHexPoint) {
     };
 }
 
-export async function generateAddress({ publicKey, accountId, path, chain }) {
+export async function generateAddress({ publicKey, accountId, path, chain }: any) {
     // console.log('publicKey', publicKey);
     console.log('accountId', accountId);
     console.log('path', path);
