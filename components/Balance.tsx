@@ -15,7 +15,7 @@ export default  function Balance({ address }: { address: number }) {
         const balanceData = await getBalance({address:address});
         console.log('balanceData', balanceData);
         const balanceInBTC = balanceData / 1e8; // Convert satoshis to BTC
-        setBalance(balanceInBTC);
+        setBalance(balanceData);
       } catch (error) {
         console.error('Failed to fetch balance:', error);
       }
@@ -26,7 +26,7 @@ export default  function Balance({ address }: { address: number }) {
   return (
     <div className="p-4 bg-gray-100 rounded-md">
     {balance !== null ? (
-      <p className="text-lg">Balance : {balance} BTC</p>
+      <p className="text-lg">Balance : {balance} Sats</p>
     ) : (
       <p className="text-lg">Loading...</p>
     )}

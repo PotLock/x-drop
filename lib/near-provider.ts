@@ -3,16 +3,14 @@ dotenv.config();
 import * as nearAPI from 'near-api-js';
 const { Near, Account, KeyPair, keyStores } = nearAPI;
 
-// configure for your linkdrop contract
-const { REACT_APP_contractId, REACT_APP_MPC_PUBLIC_KEY, REACT_APP_MPC_PATH } =
-    process.env;
-
-export const contractId = REACT_APP_contractId;
-export const MPC_PATH = REACT_APP_MPC_PATH;
-export const MPC_PUBLIC_KEY = REACT_APP_MPC_PUBLIC_KEY;
-
-const networkId = 'testnet';
-const keyStore = new keyStores.InMemoryKeyStore();
+// near config
+const { accountId, secretKey, REACT_APP_contractId: contractId } = process.env;
+export const networkId = 'testnet';
+export const keyPair = KeyPair.fromString(secretKey as any);
+export const keyStore = new keyStores.InMemoryKeyStore();
+keyStore.setKey(networkId, accountId as any, keyPair);
+// same keypair for drop contract
+keyStore.setKey(networkId, contractId as any, keyPair);
 const config = {
     networkId,
     keyStore,
@@ -26,29 +24,17 @@ const { connection } = near;
 const { provider } = connection;
 const gas = BigInt('300000000000000');
 const getTxTimeout = 20000;
-const sleep = (ms:any) => new Promise((r) => setTimeout(r, ms));
+const sleep = (ms: any) => new Promise((r) => setTimeout(r, ms));
 
-export const setAccessKey = async (secretKey:any) => {
-    const keyPair = KeyPair.fromString(secretKey);
-    const account = getAccount();
-    const accessKeys = await account.getAccessKeys();
-    const publicKey = keyPair.getPublicKey().toString();
-    const accessKey = accessKeys.find((k) => k.public_key === publicKey);
-    if (!accessKey) {
-        console.log('no access key');
-        return false;
-    }
-    keyStore.setKey(networkId, contractId as string, keyPair);
-    return true;
-};
-export const getAccount = (id = contractId) => new Account(connection, id as string);
+// default accountId is your dev accountId
+export const getAccount = (id = accountId) => new Account(connection, id as any);
 
 export const contractView = async ({
     accountId,
     contractId,
     methodName,
     args = {},
-}:any) => {
+}: any) => {
     const account = getAccount(accountId);
     let res;
     try {
@@ -72,7 +58,7 @@ export const contractCall = async ({
     contractId,
     methodName,
     args,
-}:any) => {
+}: any) => {
     const account = getAccount(accountId);
     let res;
     try {
@@ -82,7 +68,7 @@ export const contractCall = async ({
             args,
             gas,
         });
-    } catch (e:any) {
+    } catch (e: any) {
         console.log(e);
 
         if (/deserialize/gi.test(JSON.stringify(e))) {
@@ -101,17 +87,17 @@ export const contractCall = async ({
     return parseSuccessValue(res);
 };
 
-const getTxResult = async (txHash:any) => {
+const getTxResult = async (txHash: any) => {
     const transaction = await provider.txStatus(txHash, 'unnused', 'FINAL');
     return transaction;
 };
 
-const getTxSuccessValue = async (txHash:any) => {
+const getTxSuccessValue = async (txHash: any) => {
     const transaction = await getTxResult(txHash);
     return parseSuccessValue(transaction);
 };
 
-const parseSuccessValue = (transaction:any) => {
+const parseSuccessValue = (transaction: any) => {
     if (transaction.status.SuccessValue.length === 0) return;
 
     try {

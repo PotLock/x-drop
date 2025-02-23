@@ -10,7 +10,7 @@ import Link from "next/link";
 
 const MIN_SATS = 546;
 
-export default function CreateDropLink() {
+export default function CreateDropLink({ user }: { user: any }) {
   const [amount, setAmount] = useState("");
   const [chain, setChain] = useState("bitcoin");
   const [twitterAccount, setTwitterAccount] = useState("");
@@ -42,7 +42,7 @@ export default function CreateDropLink() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ amount: satsAmount, chain, twitterAccount }),
+        body: JSON.stringify({ amount: satsAmount, chain, twitterAccount , btcPublicKey: user.btcPublicKey}),
       });
 
       const data = await response.json();
@@ -103,6 +103,7 @@ export default function CreateDropLink() {
             placeholder="Enter Twitter account"
           />
         </div>
+
         <Button onClick={createDropLink} className="w-full">
           Create Drop Link
         </Button>

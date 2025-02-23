@@ -3,6 +3,7 @@ import * as nearAPI from 'near-api-js';
 import { generateAddress } from '@/lib/kdf'; // Assuming you have this utility function
 import { getAccount, contractCall } from '@/lib/near-provider'; // Adjust the import path as needed
 import dotenv from 'dotenv';
+import { NextRequest, NextResponse } from 'next/server';
 
 dotenv.config();
 
@@ -12,35 +13,29 @@ const {
     REACT_APP_MPC_PATH: MPC_PATH,
 } = process.env;
 
-export default async function POST(req: NextApiRequest, res: NextApiResponse) {
+export async function POST(req: NextRequest) {
+    const body = await req.json();
 
-    const { amount, chain, twitterAccount } = req.body;
+    const { amount, chain, twitterAccount, btcPublicKey } = body;
 
-    if (!amount || !chain || !twitterAccount) {
-        return res.status(400).json({ error: 'Missing required fields' });
+    if (!amount || !chain || !twitterAccount || !btcPublicKey) {
+        return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
     try {
-        const account = getAccount(contractId);
         const keyPair = nearAPI.KeyPair.fromRandom('ed25519');
         const publicKey = keyPair.getPublicKey().toString();
 
-        const { address: recipientAddress, publicKey: recipientPublicKey } = await generateAddress({
-            publicKey: MPC_PUBLIC_KEY,
-            accountId: contractId,
-            path: MPC_PATH,
-            chain: chain,
-        });
 
         const dropId = `drop-${Date.now()}`;
         await contractCall({
             contractId,
             methodName: 'add_drop',
             args: {
+                target: 1,
                 drop_id: dropId,
-                amount: amount.toString(),
-                recipient: recipientAddress,
-                funder: recipientPublicKey,
+                amount: amount.toString(), // Sats
+                funder: btcPublicKey,
                 path: MPC_PATH,
             },
         });
@@ -55,9 +50,9 @@ export default async function POST(req: NextApiRequest, res: NextApiResponse) {
         });
 
         const dropLink = `https://linkdrop.testnet/drop/${dropId}`;
-        res.status(200).json({ dropLink });
+        return NextResponse.json({ dropLink }, { status: 200 });
     } catch (error) {
         console.error('Error creating drop link:', error);
-        res.status(500).json({ error: 'Failed to create drop link' });
+        return NextResponse.json({ error: 'Failed to create drop link' }, { status: 500 });
     }
 }

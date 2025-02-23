@@ -122,10 +122,6 @@ async function uncompressedHexPointToNearImplicit(uncompressedHexPoint:any) {
 }
 
 export async function generateAddress({ publicKey, accountId, path, chain }:any) {
-    // console.log('publicKey', publicKey);
-    console.log('accountId', accountId);
-    console.log('path', path);
-    console.log('chain', chain);
 
     let childPublicKey = await deriveChildPublicKey(
         najPublicKeyStrToUncompressedHexPoint(publicKey),
