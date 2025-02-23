@@ -4,6 +4,7 @@ import { generateAddress } from '@/lib/kdf'; // Assuming you have this utility f
 import { getAccount, contractCall } from '@/lib/near-provider'; // Adjust the import path as needed
 import dotenv from 'dotenv';
 import { NextRequest, NextResponse } from 'next/server';
+import { generateSeedPhrase } from 'near-seed-phrase';
 
 dotenv.config();
 
@@ -23,8 +24,9 @@ export async function POST(req: NextRequest) {
     }
 
     try {
-        const keyPair = nearAPI.KeyPair.fromRandom('ed25519');
-        const publicKey = keyPair.getPublicKey().toString();
+        // to create a seed phrase with its corresponding Keys
+        const { secretKey: dropSecret } = generateSeedPhrase();
+        const dropKeyPair = nearAPI.KeyPair.fromString(dropSecret as any);
 
 
         const dropId = `drop-${Date.now()}`;
@@ -39,14 +41,16 @@ export async function POST(req: NextRequest) {
                 path: MPC_PATH,
             },
         });
-
+        console.log('Drop created:', dropId);
+        console.log('Drop key:', dropKeyPair.getPublicKey().toString());
         await contractCall({
             contractId,
             methodName: 'add_drop_key',
             args: {
                 drop_id: dropId,
-                key: publicKey,
+                key: dropKeyPair.getPublicKey().toString(),
             },
+            
         });
 
         const dropLink = `https://linkdrop.testnet/drop/${dropId}`;
