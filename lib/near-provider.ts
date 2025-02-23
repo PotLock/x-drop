@@ -68,6 +68,7 @@ export const contractCall = async ({
             args,
             gas,
         });
+
     } catch (e: any) {
         console.log(e);
 
@@ -88,7 +89,7 @@ export const contractCall = async ({
 };
 
 const getTxResult = async (txHash: any) => {
-    const transaction = await provider.txStatus(txHash, 'unnused', 'FINAL');
+    const transaction = await provider.txStatus(txHash, 'unnused', 'EXECUTED');
     return transaction;
 };
 
@@ -98,6 +99,7 @@ const getTxSuccessValue = async (txHash: any) => {
 };
 
 const parseSuccessValue = (transaction: any) => {
+    console.log('transaction', transaction);
     if (transaction.status.SuccessValue.length === 0) return;
 
     try {

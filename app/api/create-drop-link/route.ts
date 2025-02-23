@@ -28,20 +28,19 @@ export async function POST(req: NextRequest) {
         const dropKeyPair = KeyPair.fromString(dropSecret as any);
 
 
-        const dropId = `${Date.now()}`;
-        await contractCall({
+        const dropId = await contractCall({
             contractId,
             methodName: 'add_drop',
             args: {
                 target: 1,
-                drop_id: dropId,
                 amount: amount.toString(), // Sats
                 funder: btcPublicKey,
                 path: MPC_PATH,
             },
         });
-        console.log('Drop created:', dropId);
+        console.log('Drop created',dropId);
         console.log('Drop key:', dropKeyPair.getPublicKey().toString());
+        // how to know drop id after created?
         await contractCall({
             contractId,
             methodName: 'add_drop_key',
@@ -49,7 +48,6 @@ export async function POST(req: NextRequest) {
                 drop_id: dropId,
                 key: dropKeyPair.getPublicKey().toString(),
             },
-
         });
 
         const dropLink = `https://linkdrop.testnet/drop/${dropId}`;

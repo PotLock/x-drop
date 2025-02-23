@@ -58,7 +58,7 @@ impl Contract {
         funder: String,
         path: String,
         op_return_hex: Option<String>,
-    ) {
+    ) -> U128 { // Specify the return type
         require!(env::predecessor_account_id() == self.owner_id);
         self.drop_id += 1;
         self.drop_by_id.insert(
@@ -72,8 +72,8 @@ impl Contract {
                 op_return_hex,
             },
         );
+        U128(self.drop_id) // Return the drop_id
     }
-
     pub fn remove_drop(&mut self, drop_id: U128) {
         require!(env::predecessor_account_id() == self.owner_id);
 
