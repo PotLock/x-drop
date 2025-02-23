@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 
 interface User {
   address: string;
+  btcAddress:string;
 }
 
 export const useUserQuery = (address: string | undefined) => {

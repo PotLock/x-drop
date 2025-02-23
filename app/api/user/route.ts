@@ -72,7 +72,7 @@ export async function POST(req: NextRequest) {
         address: address,
         btcAddress: btcAddress,
         btcPublicKey: btcPublicKey
-      },
+      } as any,
     });
 
     return NextResponse.json(newUser, { status: 201 });

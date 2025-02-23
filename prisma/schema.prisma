@@ -13,7 +13,7 @@ datasource db {
 model User {
   id          Int      @id @default(autoincrement())
   address     String   @unique
-  btcAddress  String?
+  btcAddress  String
   btcPublicKey String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
