@@ -1,11 +1,10 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import * as nearAPI from 'near-api-js';
-import { generateAddress } from '@/lib/kdf'; // Assuming you have this utility function
-import { getAccount, contractCall } from '@/lib/near-provider'; // Adjust the import path as needed
+import { contractCall } from '@/lib/near-provider'; // Adjust the import path as needed
 import dotenv from 'dotenv';
 import { NextRequest, NextResponse } from 'next/server';
 import { generateSeedPhrase } from 'near-seed-phrase';
-
+const { KeyPair } = nearAPI;
 dotenv.config();
 
 const {
@@ -26,10 +25,10 @@ export async function POST(req: NextRequest) {
     try {
         // to create a seed phrase with its corresponding Keys
         const { secretKey: dropSecret } = generateSeedPhrase();
-        const dropKeyPair = nearAPI.KeyPair.fromString(dropSecret as any);
+        const dropKeyPair = KeyPair.fromString(dropSecret as any);
 
 
-        const dropId = `drop-${Date.now()}`;
+        const dropId = `${Date.now()}`;
         await contractCall({
             contractId,
             methodName: 'add_drop',
@@ -50,7 +49,7 @@ export async function POST(req: NextRequest) {
                 drop_id: dropId,
                 key: dropKeyPair.getPublicKey().toString(),
             },
-            
+
         });
 
         const dropLink = `https://linkdrop.testnet/drop/${dropId}`;
