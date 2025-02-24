@@ -1,5 +1,5 @@
 "use client"
-import { broadcast, getBalance, getChange } from '@/app/lib/bitcoin';
+import { broadcast, getBalance, getChange } from '@/app/(dashboard)/lib/bitcoin';
 import { useEffect, useState } from 'react';
 
 export default  function Balance({ address }: { address: number }) {

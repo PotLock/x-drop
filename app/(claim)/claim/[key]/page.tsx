@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "@/components/ui/use-toast";
 import { Loader2 } from "lucide-react";
-import { getBalance, getChange } from "@/app/lib/bitcoin";
+import { getBalance, getChange, broadcast } from "@/app/(dashboard)/lib/bitcoin";
 import { Input } from "@/components/ui/input";
 import { Label } from "recharts";
 
@@ -24,7 +24,7 @@ const config = {
 const near = new Near(config);
 const { connection } = near;
 const { provider } = connection;
-const {  REACT_APP_contractId } = process.env;
+const { REACT_APP_contractId } = process.env;
 const contractId = REACT_APP_contractId || "";
 
 export const getAccount = (id = contractId) => new Account(connection, id as any);
@@ -127,8 +127,9 @@ export default function ClaimDrop() {
         change: dropChange.toString(), // Replace with actual dropChange
       },
     });
-
+    const res2 = await broadcast(res);
     console.log('Claim result:', res);
+    console.log('broadcast result:', res2);
   }
   return (
     <div className="flex justify-center items-center mt-10">
