@@ -1,8 +1,11 @@
 import * as nearAPI from 'near-api-js';
 import { contractCall } from '@/lib/near-provider'; // Adjust the import path as needed
 import dotenv from 'dotenv';
+import { NextRequest, NextResponse } from 'next/server';
 import { generateSeedPhrase } from 'near-seed-phrase';
 const { KeyPair } = nearAPI;
+import { Buffer } from 'buffer';
+
 dotenv.config();
 
 const {
@@ -12,13 +15,13 @@ const {
     NEXT_PUBLIC_URL,
 } = process.env;
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
     const body = await req.json();
 
     const { amount, chain, twitterAccount, btcPublicKey } = body;
 
     if (!amount || !chain || !twitterAccount || !btcPublicKey) {
-        return Response.json({ error: "Missing required fields" }, { status: 400 });
+        return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
     try {
@@ -32,13 +35,11 @@ export async function POST(req: Request) {
             methodName: 'add_drop',
             args: {
                 target: 1,
-                amount: amount.toString(), // Sats
+                amount: amount, // Sats
                 funder: btcPublicKey,
                 path: MPC_PATH,
             },
         });
-        console.log('Drop created', dropId);
-        console.log('Drop key:', dropKeyPair.getPublicKey().toString());
         // how to know drop id after created?
         await contractCall({
             contractId,
@@ -52,9 +53,9 @@ export async function POST(req: Request) {
         const dropKeyPairBase64 = Buffer.from(dropSecret).toString('base64');
 
         const dropLink = `${NEXT_PUBLIC_URL}/claim/${dropId}?key=${dropKeyPairBase64}`;
-        return Response.json({ dropLink }, { status: 200 });
+        return NextResponse.json({ dropLink: dropLink }, { status: 200 });
     } catch (error) {
         console.error('Error creating drop link:', error);
-        return Response.json({ error: 'Failed to create drop link' }, { status: 500 });
+        return NextResponse.json({ error: 'Failed to create drop link' }, { status: 500 });
     }
 }

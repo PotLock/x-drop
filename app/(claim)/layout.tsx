@@ -5,7 +5,11 @@ import './globals.css'
 
 const inter = Inter({ subsets: ["latin"] })
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export const metadata = {
+  generator: 'x.dropx'
+};
+
+export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <body className={inter.className}>
@@ -17,6 +21,3 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 }
 
 
-export const metadata = {
-  generator: 'v0.dev'
-};
