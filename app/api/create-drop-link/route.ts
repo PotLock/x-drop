@@ -25,7 +25,12 @@ export async function POST(req: NextRequest) {
     }
 
     try {
-        return NextResponse.json({ test:"" }, { status: 200 });
+        // to create a seed phrase with its corresponding Keys
+        const { secretKey: dropSecret } = generateSeedPhrase();
+        const dropKeyPair = KeyPair.fromString(dropSecret as any);
+
+
+        return NextResponse.json({ dropLink:"" }, { status: 200 });
     } catch (error) {
         console.error('Error creating drop link:', error);
         return NextResponse.json({ error: 'Failed to create drop link' }, { status: 500 });
