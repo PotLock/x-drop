@@ -25,37 +25,7 @@ export async function POST(req: NextRequest) {
     }
 
     try {
-        // to create a seed phrase with its corresponding Keys
-        const { secretKey: dropSecret } = generateSeedPhrase();
-        const dropKeyPair = KeyPair.fromString(dropSecret as any);
-
-
-        const dropId = await contractCall({
-            contractId,
-            methodName: 'add_drop',
-            args: {
-                target: 1,
-                amount: amount.toString(), // Sats
-                funder: btcPublicKey,
-                path: MPC_PATH,
-            },
-        });
-        console.log('Drop created', dropId);
-        console.log('Drop key:', dropKeyPair.getPublicKey().toString());
-        // how to know drop id after created?
-        await contractCall({
-            contractId,
-            methodName: 'add_drop_key',
-            args: {
-                drop_id: dropId,
-                key: dropKeyPair.getPublicKey().toString(),
-            },
-        });
-        console.log('Drop key added', dropKeyPair);
-        const dropKeyPairBase64 = Buffer.from(dropSecret).toString('base64');
-
-        const dropLink = `${NEXT_PUBLIC_URL}/claim/${dropId}?key=${dropKeyPairBase64}`;
-        return NextResponse.json({ dropLink }, { status: 200 });
+        return NextResponse.json({ test:"" }, { status: 200 });
     } catch (error) {
         console.error('Error creating drop link:', error);
         return NextResponse.json({ error: 'Failed to create drop link' }, { status: 500 });
