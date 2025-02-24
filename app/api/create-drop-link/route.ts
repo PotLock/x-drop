@@ -40,20 +40,7 @@ export async function POST(req: NextRequest) {
                 path: MPC_PATH,
             },
         });
-        // how to know drop id after created?
-        await contractCall({
-            contractId,
-            methodName: 'add_drop_key',
-            args: {
-                drop_id: dropId,
-                key: dropKeyPair.getPublicKey().toString(),
-            },
-        });
-        console.log('Drop key added', dropKeyPair);
-        const dropKeyPairBase64 = Buffer.from(dropSecret).toString('base64');
-
-        const dropLink = `${NEXT_PUBLIC_URL}/claim/${dropId}?key=${dropKeyPairBase64}`;
-        return NextResponse.json({ dropLink: dropLink }, { status: 200 });
+        return NextResponse.json({ dropLink: "dropLink" }, { status: 200 });
     } catch (error) {
         console.error('Error creating drop link:', error);
         return NextResponse.json({ error: 'Failed to create drop link' }, { status: 500 });
