@@ -15,7 +15,6 @@ const Navbar = () => {
   const { wallet, signedAccountId } = useNear()
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  console.log(currentAccountId)
 
   const handleLogout = async () => {
     if (web3auth?.connected) {

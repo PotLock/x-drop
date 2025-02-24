@@ -1,0 +1,12 @@
+/Users/mac/dev/x-drop/contract/target/wasm32-unknown-unknown/release/deps/librlp-2d75cbce88b8638a.rmeta: /Users/mac/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rlp-0.6.1/src/lib.rs /Users/mac/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rlp-0.6.1/src/error.rs /Users/mac/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rlp-0.6.1/src/impls.rs /Users/mac/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rlp-0.6.1/src/rlpin.rs /Users/mac/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rlp-0.6.1/src/stream.rs /Users/mac/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rlp-0.6.1/src/traits.rs
+
+/Users/mac/dev/x-drop/contract/target/wasm32-unknown-unknown/release/deps/librlp-2d75cbce88b8638a.rlib: /Users/mac/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rlp-0.6.1/src/lib.rs /Users/mac/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rlp-0.6.1/src/error.rs /Users/mac/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rlp-0.6.1/src/impls.rs /Users/mac/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rlp-0.6.1/src/rlpin.rs /Users/mac/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rlp-0.6.1/src/stream.rs /Users/mac/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rlp-0.6.1/src/traits.rs
+
+/Users/mac/dev/x-drop/contract/target/wasm32-unknown-unknown/release/deps/rlp-2d75cbce88b8638a.d: /Users/mac/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rlp-0.6.1/src/lib.rs /Users/mac/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rlp-0.6.1/src/error.rs /Users/mac/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rlp-0.6.1/src/impls.rs /Users/mac/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rlp-0.6.1/src/rlpin.rs /Users/mac/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rlp-0.6.1/src/stream.rs /Users/mac/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rlp-0.6.1/src/traits.rs
+
+/Users/mac/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rlp-0.6.1/src/lib.rs:
+/Users/mac/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rlp-0.6.1/src/error.rs:
+/Users/mac/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rlp-0.6.1/src/impls.rs:
+/Users/mac/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rlp-0.6.1/src/rlpin.rs:
+/Users/mac/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rlp-0.6.1/src/stream.rs:
+/Users/mac/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/rlp-0.6.1/src/traits.rs:

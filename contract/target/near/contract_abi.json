@@ -1,0 +1,540 @@
+{
+  "schema_version": "0.4.0",
+  "metadata": {
+    "name": "contract",
+    "version": "0.1.0",
+    "build": {
+      "compiler": "rustc 1.85.0",
+      "builder": "cargo-near cargo-near-build 0.4.4"
+    },
+    "wasm_hash": "36J4werdUETdwLg23V8FGegqV3zPtWiHBggNZpeKfLqX"
+  },
+  "body": {
+    "functions": [
+      {
+        "name": "add_drop",
+        "kind": "call",
+        "params": {
+          "serialization_type": "json",
+          "args": [
+            {
+              "name": "target",
+              "type_schema": {
+                "type": "integer",
+                "format": "uint8",
+                "minimum": 0.0
+              }
+            },
+            {
+              "name": "amount",
+              "type_schema": {
+                "type": "string"
+              }
+            },
+            {
+              "name": "funder",
+              "type_schema": {
+                "type": "string"
+              }
+            },
+            {
+              "name": "path",
+              "type_schema": {
+                "type": "string"
+              }
+            },
+            {
+              "name": "op_return_hex",
+              "type_schema": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            }
+          ]
+        },
+        "result": {
+          "serialization_type": "json",
+          "type_schema": {
+            "type": "string"
+          }
+        }
+      },
+      {
+        "name": "add_drop_key",
+        "kind": "call",
+        "params": {
+          "serialization_type": "json",
+          "args": [
+            {
+              "name": "drop_id",
+              "type_schema": {
+                "type": "string"
+              }
+            },
+            {
+              "name": "key",
+              "type_schema": {
+                "type": "string"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "name": "callback",
+        "kind": "call",
+        "modifiers": [
+          "private"
+        ],
+        "params": {
+          "serialization_type": "json",
+          "args": [
+            {
+              "name": "bitcoin_tx",
+              "type_schema": {
+                "$ref": "#/definitions/BitcoinTransaction"
+              }
+            },
+            {
+              "name": "bitcoin_pubkey",
+              "type_schema": {
+                "type": "array",
+                "items": {
+                  "type": "integer",
+                  "format": "uint8",
+                  "minimum": 0.0
+                }
+              }
+            }
+          ]
+        },
+        "callbacks": [
+          {
+            "serialization_type": "json",
+            "type_schema": {
+              "$ref": "#/definitions/SignatureResponse"
+            }
+          }
+        ],
+        "result": {
+          "serialization_type": "json",
+          "type_schema": {
+            "type": "string"
+          }
+        }
+      },
+      {
+        "name": "claim",
+        "kind": "call",
+        "params": {
+          "serialization_type": "json",
+          "args": [
+            {
+              "name": "txid_str",
+              "type_schema": {
+                "type": "string"
+              }
+            },
+            {
+              "name": "vout",
+              "type_schema": {
+                "type": "integer",
+                "format": "uint32",
+                "minimum": 0.0
+              }
+            },
+            {
+              "name": "receiver",
+              "type_schema": {
+                "type": "string"
+              }
+            },
+            {
+              "name": "change",
+              "type_schema": {
+                "type": "string"
+              }
+            }
+          ]
+        },
+        "result": {
+          "serialization_type": "json",
+          "type_schema": {
+            "$ref": "#/definitions/Promise"
+          }
+        }
+      },
+      {
+        "name": "contract_source_metadata",
+        "kind": "view"
+      },
+      {
+        "name": "get_drops",
+        "kind": "view",
+        "result": {
+          "serialization_type": "json",
+          "type_schema": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      {
+        "name": "get_keys",
+        "kind": "view",
+        "params": {
+          "serialization_type": "json",
+          "args": [
+            {
+              "name": "drop_id",
+              "type_schema": {
+                "type": "string"
+              }
+            }
+          ]
+        },
+        "result": {
+          "serialization_type": "json",
+          "type_schema": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      {
+        "name": "init",
+        "kind": "call",
+        "modifiers": [
+          "init"
+        ],
+        "params": {
+          "serialization_type": "json",
+          "args": [
+            {
+              "name": "owner_id",
+              "type_schema": {
+                "$ref": "#/definitions/AccountId"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "name": "remove_drop",
+        "kind": "call",
+        "params": {
+          "serialization_type": "json",
+          "args": [
+            {
+              "name": "drop_id",
+              "type_schema": {
+                "type": "string"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "name": "remove_key",
+        "kind": "call",
+        "params": {
+          "serialization_type": "json",
+          "args": [
+            {
+              "name": "key",
+              "type_schema": {
+                "type": "string"
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "root_schema": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "String",
+      "type": "string",
+      "definitions": {
+        "AccountId": {
+          "description": "NEAR Account Identifier.\n\nThis is a unique, syntactically valid, human-readable account identifier on the NEAR network.\n\n[See the crate-level docs for information about validation.](index.html#account-id-rules)\n\nAlso see [Error kind precedence](AccountId#error-kind-precedence).\n\n## Examples\n\n``` use near_account_id::AccountId;\n\nlet alice: AccountId = \"alice.near\".parse().unwrap();\n\nassert!(\"ƒelicia.near\".parse::<AccountId>().is_err()); // (ƒ is not f) ```",
+          "type": "string"
+        },
+        "Amount": {
+          "description": "An amount.\n\nThe [`Amount`] type can be used to express Bitcoin amounts that support arithmetic and conversion to various denominations.",
+          "type": "integer",
+          "format": "uint64",
+          "minimum": 0.0
+        },
+        "BitcoinTransaction": {
+          "type": "object",
+          "required": [
+            "input",
+            "lock_time",
+            "output",
+            "version"
+          ],
+          "properties": {
+            "input": {
+              "description": "List of transaction inputs.",
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/TxIn"
+              }
+            },
+            "lock_time": {
+              "description": "Block height or timestamp. Transaction cannot be included in a block until this height/time.\n\n### Relevant BIPs\n\n* [BIP-65 OP_CHECKLOCKTIMEVERIFY](https://github.com/bitcoin/bips/blob/master/bip-0065.mediawiki) * [BIP-113 Median time-past as endpoint for lock-time calculations](https://github.com/bitcoin/bips/blob/master/bip-0113.mediawiki)",
+              "allOf": [
+                {
+                  "$ref": "#/definitions/LockTime"
+                }
+              ]
+            },
+            "output": {
+              "description": "List of transaction outputs.",
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/TxOut"
+              }
+            },
+            "version": {
+              "description": "The protocol version, is currently expected to be 1 or 2 (BIP 68).",
+              "allOf": [
+                {
+                  "$ref": "#/definitions/Version"
+                }
+              ]
+            }
+          }
+        },
+        "Hash": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "format": "uint8",
+            "minimum": 0.0
+          },
+          "maxItems": 32,
+          "minItems": 32
+        },
+        "LockTime": {
+          "description": "Locktime itself is an unsigned 4-byte integer which can be parsed two ways:\n\nIf less than 500 million, locktime is parsed as a block height. The transaction can be added to any block which has this height or higher.\n\nIf greater than or equal to 500 million, locktime is parsed using the Unix epoch time format (the number of seconds elapsed since 1970-01-01T00:00 UTC—currently over 1.395 billion). The transaction can be added to any block whose block time is greater than the locktime.\n\n[Bitcoin Devguide]: https://developer.bitcoin.org/devguide/transactions.html#locktime-and-sequence-number",
+          "type": "integer",
+          "format": "uint32",
+          "minimum": 0.0
+        },
+        "OutPoint": {
+          "description": "A reference to a transaction output.\n\n### Bitcoin Core References\n\n* [COutPoint definition](https://github.com/bitcoin/bitcoin/blob/345457b542b6a980ccfbc868af0970a6f91d1b82/src/primitives/transaction.h#L26)",
+          "type": "object",
+          "required": [
+            "txid",
+            "vout"
+          ],
+          "properties": {
+            "txid": {
+              "description": "The referenced transaction's txid.",
+              "allOf": [
+                {
+                  "$ref": "#/definitions/Txid"
+                }
+              ]
+            },
+            "vout": {
+              "description": "The index of the referenced output in its transaction's vout.",
+              "type": "integer",
+              "format": "uint32",
+              "minimum": 0.0
+            }
+          }
+        },
+        "Promise": true,
+        "ScriptBuf": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "format": "uint8",
+            "minimum": 0.0
+          }
+        },
+        "Sequence": {
+          "description": "Bitcoin transaction input sequence number.",
+          "type": "integer",
+          "format": "uint32",
+          "minimum": 0.0
+        },
+        "SerializableAffinePoint": {
+          "type": "object",
+          "required": [
+            "affine_point"
+          ],
+          "properties": {
+            "affine_point": {
+              "type": "string"
+            }
+          }
+        },
+        "SerializableScalar": {
+          "type": "object",
+          "required": [
+            "scalar"
+          ],
+          "properties": {
+            "scalar": {
+              "type": "string"
+            }
+          }
+        },
+        "SignatureResponse": {
+          "type": "object",
+          "required": [
+            "big_r",
+            "recovery_id",
+            "s"
+          ],
+          "properties": {
+            "big_r": {
+              "$ref": "#/definitions/SerializableAffinePoint"
+            },
+            "recovery_id": {
+              "type": "integer",
+              "format": "uint8",
+              "minimum": 0.0
+            },
+            "s": {
+              "$ref": "#/definitions/SerializableScalar"
+            }
+          }
+        },
+        "TxIn": {
+          "description": "Bitcoin transaction input.\n\nIt contains the location of the previous transaction's output, that it spends and set of scripts that satisfy its spending conditions.\n\n### Bitcoin Core References\n\n* [CTxIn definition](https://github.com/bitcoin/bitcoin/blob/345457b542b6a980ccfbc868af0970a6f91d1b82/src/primitives/transaction.h#L65)",
+          "type": "object",
+          "required": [
+            "previous_output",
+            "script_sig",
+            "sequence",
+            "witness"
+          ],
+          "properties": {
+            "previous_output": {
+              "description": "The reference to the previous output that is being used as an input.",
+              "allOf": [
+                {
+                  "$ref": "#/definitions/OutPoint"
+                }
+              ]
+            },
+            "script_sig": {
+              "description": "The script which pushes values on the stack which will cause the referenced output's script to be accepted.",
+              "allOf": [
+                {
+                  "$ref": "#/definitions/ScriptBuf"
+                }
+              ]
+            },
+            "sequence": {
+              "description": "The sequence number, which suggests to miners which of two conflicting transactions should be preferred, or 0xFFFFFFFF to ignore this feature. This is generally never used since the miner behavior cannot be enforced.",
+              "allOf": [
+                {
+                  "$ref": "#/definitions/Sequence"
+                }
+              ]
+            },
+            "witness": {
+              "description": "Witness data: an array of byte-arrays. Note that this field is *not* (de)serialized with the rest of the TxIn in Encodable/Decodable, as it is (de)serialized at the end of the full Transaction. It *is* (de)serialized with the rest of the TxIn in other (de)serialization routines.",
+              "allOf": [
+                {
+                  "$ref": "#/definitions/Witness"
+                }
+              ]
+            }
+          }
+        },
+        "TxOut": {
+          "description": "Bitcoin transaction output.\n\nDefines new coins to be created as a result of the transaction, along with spending conditions (\"script\", aka \"output script\"), which an input spending it must satisfy.\n\nAn output that is not yet spent by an input is called Unspent Transaction Output (\"UTXO\").\n\n### Bitcoin Core References\n\n* [CTxOut definition](https://github.com/bitcoin/bitcoin/blob/345457b542b6a980ccfbc868af0970a6f91d1b82/src/primitives/transaction.h#L148)",
+          "type": "object",
+          "required": [
+            "script_pubkey",
+            "value"
+          ],
+          "properties": {
+            "script_pubkey": {
+              "description": "The script which must be satisfied for the output to be spent.",
+              "allOf": [
+                {
+                  "$ref": "#/definitions/ScriptBuf"
+                }
+              ]
+            },
+            "value": {
+              "description": "The value of the output, in satoshis.",
+              "allOf": [
+                {
+                  "$ref": "#/definitions/Amount"
+                }
+              ]
+            }
+          }
+        },
+        "Txid": {
+          "$ref": "#/definitions/Hash"
+        },
+        "Version": {
+          "description": "The transaction version.\n\nCurrently, as specified by [BIP-68], only version 1 and 2 are considered standard.\n\n[BIP-68]: https://github.com/bitcoin/bips/blob/master/bip-0068.mediawiki",
+          "oneOf": [
+            {
+              "description": "The original Bitcoin transaction version (pre-BIP-68)",
+              "type": "string",
+              "enum": [
+                "One"
+              ]
+            },
+            {
+              "description": "The second Bitcoin transaction version (post-BIP-68)",
+              "type": "string",
+              "enum": [
+                "Two"
+              ]
+            }
+          ]
+        },
+        "Witness": {
+          "description": "The Witness is the data used to unlock bitcoin since the [segwit upgrade].\n\nCan be logically seen as an array of bytestrings, i.e. `Vec<Vec<u8>>`, and it is serialized on the wire in that format. You can convert between this type and `Vec<Vec<u8>>` by using [`Witness::from_slice`] and [`Witness::to_vec`].\n\nFor serialization and deserialization performance it is stored internally as a single `Vec`, saving some allocations.\n\n[segwit upgrade]: <https://github.com/bitcoin/bips/blob/master/bip-0143.mediawiki>",
+          "type": "object",
+          "required": [
+            "content",
+            "indices_start",
+            "witness_elements"
+          ],
+          "properties": {
+            "content": {
+              "description": "Contains the witness `Vec<Vec<u8>>` serialization.\n\nDoes not include the initial varint indicating the number of elements. Each element however, does include a varint indicating the element length. The number of elements is stored in `witness_elements`.\n\nConcatenated onto the end of `content` is the index area. This is a `4 * witness_elements` bytes area which stores the index of the start of each witness item.",
+              "type": "array",
+              "items": {
+                "type": "integer",
+                "format": "uint8",
+                "minimum": 0.0
+              }
+            },
+            "indices_start": {
+              "description": "This is the valid index pointing to the beginning of the index area.\n\nSaid another way, this is the total length of all witness elements serialized (without the element count but with their sizes serialized as compact size).",
+              "type": "integer",
+              "format": "uint",
+              "minimum": 0.0
+            },
+            "witness_elements": {
+              "description": "The number of elements in the witness.\n\nStored separately (instead of as a VarInt in the initial part of content) so that methods like [`Witness::push`] don't have to shift the entire array.",
+              "type": "integer",
+              "format": "uint",
+              "minimum": 0.0
+            }
+          }
+        }
+      }
+    }
+  }
+}
