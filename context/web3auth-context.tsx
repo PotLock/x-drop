@@ -74,21 +74,22 @@ const web3auth = new Web3AuthNoModal({
 });
 
 // Add JWT configuration for Twitter Auth
-const authAdapter = new AuthAdapter({  adapterSettings: {
-  loginConfig: {
-    jwt: {
-      verifier: "w3a-firebase-twitter",
-      typeOfLogin: "jwt",
-      clientId: process.env.NEXT_PUBLIC_WEB3AUTH_CLIENT_ID || "",
-      jwtParameters: {
-        sub: "sub",
-        name: "name",
-        picture: "picture",
-        verifierIdField: "sub"
-      }
+const authAdapter = new AuthAdapter({
+  adapterSettings: {
+    loginConfig: {
+      jwt: {
+        verifier: "w3a-firebase-twitter",
+        typeOfLogin: "jwt",
+        clientId: process.env.NEXT_PUBLIC_WEB3AUTH_CLIENT_ID || "",
+        jwtParameters: {
+          sub: "sub",
+          name: "name",
+          picture: "picture",
+          verifierIdField: "sub"
+        }
+      },
     },
   },
-},
 });
 
 web3auth.configureAdapter(authAdapter);
@@ -111,7 +112,7 @@ export function Web3AuthProvider({ children }: Web3AuthProviderProps) {
       const app = initializeApp(firebaseConfig);
       const auth = getAuth(app);
       const twitterProvider = new TwitterAuthProvider();
-      
+
       // Add scopes if needed
       twitterProvider.setCustomParameters({
         'lang': 'en'
@@ -132,7 +133,7 @@ export function Web3AuthProvider({ children }: Web3AuthProviderProps) {
     try {
       const myKeyStore = new keyStores.InMemoryKeyStore();
       await myKeyStore.setKey("testnet", newAccountId, keyPair);
-      
+
       const connectionConfig = {
         networkId: "testnet",
         keyStore: myKeyStore,
@@ -178,7 +179,7 @@ export function Web3AuthProvider({ children }: Web3AuthProviderProps) {
 
   const createOrGetUser = async (userAddress: string) => {
     try {
-      const response = await fetch(`/api/user`,{
+      const response = await fetch(`/api/user`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -203,7 +204,7 @@ export function Web3AuthProvider({ children }: Web3AuthProviderProps) {
       const privateKeyEd25519Buffer = Buffer.from(privateKeyEd25519, "hex");
       const bs58encode = utils.serialize.base_encode(privateKeyEd25519Buffer);
       const keyPair = KeyPair.fromString(`ed25519:${bs58encode}`);
-      
+
       const publicKey = keyPair.getPublicKey();
 
       // Get user info from Web3Auth
@@ -230,7 +231,7 @@ export function Web3AuthProvider({ children }: Web3AuthProviderProps) {
         await createOrGetUser(accountId);
         localStorage.setItem('accountId', accountId);
       }
-      
+
       await setupNearConnection(keyPair, accountId);
       setAccountId(accountId);
       return { accountId };
@@ -280,7 +281,7 @@ export function Web3AuthProvider({ children }: Web3AuthProviderProps) {
     try {
       setIsLoading(true);
       setError(null);
-      
+
       if (web3auth.connected) {
         await web3auth.logout();
         setProvider(null);
@@ -296,20 +297,70 @@ export function Web3AuthProvider({ children }: Web3AuthProviderProps) {
     }
   };
 
-   // Initialize Web3Auth
+  // Initialize Web3Auth
   useEffect(() => {
     const init = async () => {
       try {
         setIsLoading(true);
         await web3auth.init();
-        
-        // Force logout when page loads
-        if (web3auth.connected) {
-          await web3auth.logout();
-          setProvider(null);
-          setAccountId(null);
-          setNearConnection(null);
-          localStorage.removeItem('accountId');
+
+        // Check if user was previously logged in
+        const savedAccountId = localStorage.getItem('accountId');
+        if (savedAccountId && web3auth) {
+          try {
+            if (!web3auth.connected) {
+              // Only attempt to reconnect if not already connected
+              // Trigger Twitter/X login
+              const loginRes = await signInWithTwitter();
+
+              const idToken = await loginRes.user.getIdToken(true);
+
+              // Login in No Modal SDK with Twitter / X idToken
+              const web3authProvider = await web3auth.connectTo(WALLET_ADAPTERS.AUTH, {
+                loginProvider: "jwt",
+                extraLoginOptions: {
+                  id_token: idToken,
+                  verifierIdField: "sub",
+                },
+              });
+
+              if (web3authProvider) {
+                setProvider(web3authProvider);
+                setAccountId(savedAccountId);
+
+                // Recreate NEAR connection
+                const privateKey = await web3authProvider.request({ method: "private_key" });
+                const privateKeyEd25519 = getED25519Key(privateKey as string).sk.toString("hex");
+                const privateKeyEd25519Buffer = Buffer.from(privateKeyEd25519, "hex");
+                const bs58encode = utils.serialize.base_encode(privateKeyEd25519Buffer);
+                const keyPair = KeyPair.fromString(`ed25519:${bs58encode}`);
+
+                await setupNearConnection(keyPair, savedAccountId);
+              }
+            } else {
+              // If already connected, just get the provider and restore the connection
+              const web3authProvider = await web3auth.provider;
+              if (web3authProvider) {
+                setProvider(web3authProvider);
+                setAccountId(savedAccountId);
+
+                // Recreate NEAR connection
+                const privateKey = await web3authProvider.request({ method: "private_key" });
+                const privateKeyEd25519 = getED25519Key(privateKey as string).sk.toString("hex");
+                const privateKeyEd25519Buffer = Buffer.from(privateKeyEd25519, "hex");
+                const bs58encode = utils.serialize.base_encode(privateKeyEd25519Buffer);
+                const keyPair = KeyPair.fromString(`ed25519:${bs58encode}`);
+
+                await setupNearConnection(keyPair, savedAccountId);
+              }
+            }
+          } catch (error) {
+            console.error("Error restoring session:", error);
+            localStorage.removeItem('accountId');
+            setProvider(null);
+            setAccountId(null);
+            setNearConnection(null);
+          }
         }
         
         console.log("Web3Auth initialized successfully");

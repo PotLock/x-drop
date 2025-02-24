@@ -13,28 +13,31 @@ export default function AuthCallback() {
     const handleCallback = async () => {
       try {
         // Get hash from URL
-        const hash = window.location.hash;
-        
-        if (hash) {
-          // Let Web3Auth handle the callback
-          await web3auth.connectTo(WALLET_ADAPTERS.AUTH, {
-            loginProvider: "jwt",
-            extraLoginOptions: {
-              domain: process.env.NEXT_PUBLIC_AUTH0_DOMAIN,
-              verifierIdField: "sub",
-              verifier: "w3a-auth0-twitter",
-              clientId: process.env.NEXT_PUBLIC_AUTH0_CLIENT_ID,
-              connection: "twitter"
+        if (typeof window !== 'undefined') {
+          const hash = window.location.hash;
+
+          if (hash) {
+            // Let Web3Auth handle the callback
+            await web3auth.connectTo(WALLET_ADAPTERS.AUTH, {
+              loginProvider: "jwt",
+              extraLoginOptions: {
+                domain: process.env.NEXT_PUBLIC_AUTH0_DOMAIN,
+                verifierIdField: "sub",
+                verifier: "w3a-auth0-twitter",
+                clientId: process.env.NEXT_PUBLIC_AUTH0_CLIENT_ID,
+                connection: "twitter"
+              }
+            });
+
+            // Close popup if in popup mode
+            if (window.opener) {
+              window.close();
+            } else {
+              // Redirect to home page
+              router.push('/');
             }
-          });
-          
-          // Close popup if in popup mode
-          if (window.opener) {
-            window.close();
-          } else {
-            // Redirect to home page
-            router.push('/');
           }
+
         } else {
           console.error('No hash found in callback URL');
           router.push('/');
