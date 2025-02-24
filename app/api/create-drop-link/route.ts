@@ -11,6 +11,7 @@ const {
     REACT_APP_contractId: contractId,
     REACT_APP_MPC_PUBLIC_KEY: MPC_PUBLIC_KEY,
     REACT_APP_MPC_PATH: MPC_PATH,
+    NEXT_PUBLIC_URL,
 } = process.env;
 
 export async function POST(req: NextRequest) {
@@ -49,8 +50,10 @@ export async function POST(req: NextRequest) {
                 key: dropKeyPair.getPublicKey().toString(),
             },
         });
-
-        const dropLink = `https://linkdrop.testnet/drop/${dropId}`;
+        console.log('Drop key added', dropKeyPair);
+        const dropKeyPairBase64 = Buffer.from(dropSecret).toString('base64');
+        
+        const dropLink = `${NEXT_PUBLIC_URL}/claim/${dropId}?key=${dropKeyPairBase64}`;
         return NextResponse.json({ dropLink }, { status: 200 });
     } catch (error) {
         console.error('Error creating drop link:', error);

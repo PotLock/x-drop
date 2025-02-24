@@ -15,6 +15,7 @@ export default function CreateDropLink({ user }: { user: any }) {
   const [chain, setChain] = useState("bitcoin");
   const [twitterAccount, setTwitterAccount] = useState("");
   const [dropLink, setDropLink] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const createDropLink = async () => {
     if (!amount || !chain || !twitterAccount) {
@@ -37,6 +38,8 @@ export default function CreateDropLink({ user }: { user: any }) {
     }
 
     try {
+      setIsLoading(true);
+
       const response = await fetch('/api/create-drop-link', {
         method: 'POST',
         headers: {
@@ -53,6 +56,8 @@ export default function CreateDropLink({ user }: { user: any }) {
           description: "Drop link created successfully.",
           variant: "default",
         });
+        setIsLoading(false);
+
       } else {
         throw new Error(data.error);
       }
@@ -104,8 +109,8 @@ export default function CreateDropLink({ user }: { user: any }) {
           />
         </div>
 
-        <Button onClick={createDropLink} className="w-full">
-          Create Drop Link
+        <Button onClick={createDropLink} disabled={isLoading} className="w-full">
+        {isLoading ? 'Loading...' : 'Create Drop Link'}
         </Button>
         {dropLink && (
           <div className="p-4 bg-secondary rounded-md break-all">
