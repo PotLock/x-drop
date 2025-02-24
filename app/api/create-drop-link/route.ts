@@ -1,8 +1,6 @@
-import { NextApiRequest, NextApiResponse } from 'next';
 import * as nearAPI from 'near-api-js';
 import { contractCall } from '@/lib/near-provider'; // Adjust the import path as needed
 import dotenv from 'dotenv';
-import { NextRequest, NextResponse } from 'next/server';
 import { generateSeedPhrase } from 'near-seed-phrase';
 const { KeyPair } = nearAPI;
 dotenv.config();
@@ -14,13 +12,13 @@ const {
     NEXT_PUBLIC_URL,
 } = process.env;
 
-export async function POST(req: NextRequest) {
+export async function POST(req: Request) {
     const body = await req.json();
 
     const { amount, chain, twitterAccount, btcPublicKey } = body;
 
     if (!amount || !chain || !twitterAccount || !btcPublicKey) {
-        return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+        return Response.json({ error: "Missing required fields" }, { status: 400 });
     }
 
     try {
@@ -39,7 +37,7 @@ export async function POST(req: NextRequest) {
                 path: MPC_PATH,
             },
         });
-        console.log('Drop created',dropId);
+        console.log('Drop created', dropId);
         console.log('Drop key:', dropKeyPair.getPublicKey().toString());
         // how to know drop id after created?
         await contractCall({
@@ -52,11 +50,11 @@ export async function POST(req: NextRequest) {
         });
         console.log('Drop key added', dropKeyPair);
         const dropKeyPairBase64 = Buffer.from(dropSecret).toString('base64');
-        
+
         const dropLink = `${NEXT_PUBLIC_URL}/claim/${dropId}?key=${dropKeyPairBase64}`;
-        return NextResponse.json({ dropLink }, { status: 200 });
+        return Response.json({ dropLink }, { status: 200 });
     } catch (error) {
         console.error('Error creating drop link:', error);
-        return NextResponse.json({ error: 'Failed to create drop link' }, { status: 500 });
+        return Response.json({ error: 'Failed to create drop link' }, { status: 500 });
     }
 }
