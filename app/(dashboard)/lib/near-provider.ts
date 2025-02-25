@@ -26,14 +26,18 @@ const { connection } = near;
 const { provider } = connection;
 const gas = BigInt('300000000000000');
 const getTxTimeout = 20000;
-const sleep = (ms:any) => new Promise((r) => setTimeout(r, ms));
+const sleep = (ms: any) => new Promise((r) => setTimeout(r, ms));
 
-export const setAccessKey = async (secretKey:any) => {
+export const setAccessKey = async (secretKey: any) => {
     const keyPair = KeyPair.fromString(secretKey);
-    const account = getAccount();
+    const accountId = keyPair.getPublicKey().toString(); // Remove the 'ed25519:' prefix
+
+    const account = getAccount(accountId);
     const accessKeys = await account.getAccessKeys();
     const publicKey = keyPair.getPublicKey().toString();
+    
     const accessKey = accessKeys.find((k) => k.public_key === publicKey);
+
     if (!accessKey) {
         console.log('no access key');
         return false;
@@ -48,7 +52,7 @@ export const contractView = async ({
     contractId,
     methodName,
     args = {},
-}:any) => {
+}: any) => {
     const account = getAccount(accountId);
     let res;
     try {
@@ -72,8 +76,9 @@ export const contractCall = async ({
     contractId,
     methodName,
     args,
-}:any) => {
+}: any) => {
     const account = getAccount(accountId);
+    console.log(account)
     let res;
     try {
         res = await account.functionCall({
@@ -82,7 +87,7 @@ export const contractCall = async ({
             args,
             gas,
         });
-    } catch (e:any) {
+    } catch (e: any) {
         console.log(e);
 
         if (/deserialize/gi.test(JSON.stringify(e))) {
@@ -101,17 +106,17 @@ export const contractCall = async ({
     return parseSuccessValue(res);
 };
 
-const getTxResult = async (txHash:any) => {
+const getTxResult = async (txHash: any) => {
     const transaction = await provider.txStatus(txHash, 'unnused', 'FINAL');
     return transaction;
 };
 
-const getTxSuccessValue = async (txHash:any) => {
+const getTxSuccessValue = async (txHash: any) => {
     const transaction = await getTxResult(txHash);
     return parseSuccessValue(transaction);
 };
 
-const parseSuccessValue = (transaction:any) => {
+const parseSuccessValue = (transaction: any) => {
     if (transaction.status.SuccessValue.length === 0) return;
 
     try {
