@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useParams, useSearchParams } from "next/navigation";
-import { connect, keyStores, WalletConnection, KeyPair, Account, Near } from "near-api-js";
+import { connect, keyStores, WalletConnection, KeyPair, Account, Near, } from "near-api-js";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "@/components/ui/use-toast";
@@ -11,23 +11,11 @@ import { getBalance, getChange, broadcast } from "@/app/(dashboard)/lib/bitcoin"
 import { Input } from "@/components/ui/input";
 import { Label } from "recharts";
 
-// NEAR testnet configuration
-const config = {
-  networkId: "testnet",
-  keyStore: new keyStores.BrowserLocalStorageKeyStore(),
-  nodeUrl: "https://rpc.testnet.near.org",
-  walletUrl: "https://wallet.testnet.near.org",
-  helperUrl: "https://helper.testnet.near.org",
-  explorerUrl: "https://explorer.testnet.near.org",
-};
+import {
+  setAccessKey,
+  contractCall,
+} from './near-provider';
 
-const near = new Near(config);
-const { connection } = near;
-const { provider } = connection;
-const { REACT_APP_contractId } = process.env;
-const contractId = REACT_APP_contractId || "";
-
-export const getAccount = (id = contractId) => new Account(connection, id as any);
 
 export default function ClaimDrop() {
   const params = useParams();
@@ -35,58 +23,22 @@ export default function ClaimDrop() {
   const [near, setNear] = useState<any>(null);
   const [wallet, setWallet] = useState<WalletConnection | null>(null);
   const [dropInfo, setDropInfo] = useState<any>(null);
-  const [secretKey, setSecretKey] = useState<string | null>(key ? atob(key as string) : null);
+  const [secretKey, setSecretKey] = useState<string | null>(key ? atob(decodeURIComponent(key as string)) : null);
   const [isLoading, setIsLoading] = useState(false);
-  const [address, setAddress] = useState<string>("");
+  const [address, setAddress] = useState<string>("mgMK97mK1ZJGgoWoQc6dqHoEpfbn88SYw4");
+  const [errorMsg, setErrorMsg] = useState<string>("");
 
-  useEffect(() => {
-    initNear();
-  }, []);
-
-  // Initialize NEAR connection
-  const initNear = async () => {
-    try {
-      const nearConnection = await connect(config);
-      const walletConnection = new WalletConnection(nearConnection, "near-bitcoin-linkdrop");
-      setNear(nearConnection);
-      setWallet(walletConnection);
-
-      if (walletConnection.isSignedIn()) {
-        fetchDropInfo();
-      }
-
-      if (secretKey) {
-        const dropKeyPair = KeyPair.fromString(secretKey as any);
-        const networkId = config.networkId;
-        await config.keyStore.setKey(networkId, contractId, dropKeyPair);
-      }
-    } catch (error) {
-      console.error("Error initializing NEAR:", error);
-      toast({
-        title: "Connection Error",
-        description: "Failed to connect to NEAR network.",
-        variant: "destructive",
-      });
-    }
-  };
-
-  // Fetch drop information
-  const fetchDropInfo = async () => {
-    if (!wallet || !params.dropId) return;
-
-    try {
-      setIsLoading(true);
-      // Fetch drop information logic here
-      // ...
-      setIsLoading(false);
-    } catch (error) {
-      console.error('Failed to fetch drop information:', error);
-      setIsLoading(false);
-    }
-  };
 
   const claim = async () => {
-    const account = getAccount(contractId);
+    setIsLoading(true)
+    const contractId = 'satisfying-bell.testnet';
+    const isSet = await setAccessKey(secretKey);
+    if (!isSet) {
+      setIsLoading(false)
+      setErrorMsg('link is invalid or already used');
+      return;
+    }
+
     const DROP_SATS = 546;
     let funderBalance = null;
     let funderTxId = null;
@@ -101,9 +53,9 @@ export default function ClaimDrop() {
       address: address,
       getUtxos: true,
     });
+    console.log('utxos', utxos);
     funderTxId = utxos[0].txid;
 
-    console.log();
 
     dropChange = await getChange({
       balance: funderBalance,
@@ -116,20 +68,25 @@ export default function ClaimDrop() {
     console.log(`funderBalance ${funderBalance}`);
     console.log('dropChange', dropChange);
 
+    try {
 
-    const res = await account.functionCall({
-      contractId,
-      methodName: 'claim',
-      args: {
-        txid_str: funderTxId, // Replace with actual funderTxId
-        vout: utxos[0].vout, // Replace with actual funderUtxoOut
-        receiver: address, // Replace with actual funderAddress
-        change: dropChange.toString(), // Replace with actual dropChange
-      },
-    });
-    const res2 = await broadcast(res);
-    console.log('Claim result:', res);
-    console.log('broadcast result:', res2);
+      const res = await contractCall({
+        contractId: contractId as any,
+        methodName: 'claim',
+        args: {
+          txid_str: funderTxId, // Replace with actual funderTxId
+          vout: utxos[0].vout, // Replace with actual funderUtxoOut
+          receiver: address, // Replace with actual funderAddress
+          change: dropChange.toString(), // Replace with actual dropChange
+        },
+      });
+      console.log('Claim result:', res);
+
+      setDropInfo(res);
+    } catch (error) {
+
+    }
+    setIsLoading(false);
   }
   return (
     <div className="flex justify-center items-center mt-10">
@@ -148,13 +105,19 @@ export default function ClaimDrop() {
               placeholder="Enter your Bitcoin address"
             />
           </div>
-          {isLoading ? (
-            <Loader2 className="animate-spin" />
-          ) : (
-            <div className="flex justify-start mt-3">
-              <Button onClick={claim} disabled={!secretKey || !wallet || !address}>
-                Claim Drop
-              </Button>
+
+          <div className="flex justify-start mt-3">
+            <Button onClick={claim} disabled={!secretKey || !address || isLoading}  >
+              Claim Drop
+              {isLoading ? (
+                <Loader2 className="animate-spin" />
+              ) : ""}
+            </Button>
+          </div>
+
+          {errorMsg && (
+            <div>
+              <p>{errorMsg} </p>
             </div>
           )}
           {dropInfo && (

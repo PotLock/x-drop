@@ -1,4 +1,5 @@
 import * as dotenv from 'dotenv';
+import { utils } from 'elliptic';
 dotenv.config();
 import * as nearAPI from 'near-api-js';
 const { Near, Account, KeyPair, keyStores } = nearAPI;
@@ -30,7 +31,6 @@ const sleep = (ms: any) => new Promise((r) => setTimeout(r, ms));
 export const getAccount = (id = accountId) => new Account(connection, id as any);
 
 export const contractView = async ({
-    accountId,
     contractId,
     methodName,
     args = {},
@@ -52,6 +52,7 @@ export const contractView = async ({
     }
     return res;
 };
+
 
 export const contractCall = async ({
     accountId,

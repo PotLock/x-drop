@@ -9,6 +9,7 @@ import { Buffer } from 'buffer';
 dotenv.config();
 
 const {
+    accountId,
     REACT_APP_contractId: contractId,
     REACT_APP_MPC_PUBLIC_KEY: MPC_PUBLIC_KEY,
     REACT_APP_MPC_PATH: MPC_PATH,
@@ -30,16 +31,21 @@ export async function POST(req: NextRequest) {
         const dropKeyPair = KeyPair.fromString(dropSecret as any);
 
 
+
         const dropId = await contractCall({
             contractId,
             methodName: 'add_drop',
             args: {
                 target: 1,
-                amount: amount, // Sats
+                amount: amount.toString(), // Sats
                 funder: btcPublicKey,
                 path: MPC_PATH,
             },
         });
+        if (!dropId) {
+            return NextResponse.json({ error: "Failed to create drop" }, { status: 500 });
+        }
+
         // how to know drop id after created?
         await contractCall({
             contractId,
@@ -52,7 +58,7 @@ export async function POST(req: NextRequest) {
         console.log('Drop key added', dropKeyPair);
         const dropKeyPairBase64 = Buffer.from(dropSecret).toString('base64');
 
-        const dropLink = `${NEXT_PUBLIC_URL}/claim/${dropId}?key=${dropKeyPairBase64}`;
+        const dropLink = `${NEXT_PUBLIC_URL}/claim/${dropKeyPairBase64}`;
         return NextResponse.json({ dropLink: dropLink }, { status: 200 });
     } catch (error) {
         console.error('Error creating drop link:', error);
