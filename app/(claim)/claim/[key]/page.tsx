@@ -20,8 +20,6 @@ import {
 export default function ClaimDrop() {
   const params = useParams();
   const { key } = params;
-  const [near, setNear] = useState<any>(null);
-  const [wallet, setWallet] = useState<WalletConnection | null>(null);
   const [dropInfo, setDropInfo] = useState<any>(null);
   const [secretKey, setSecretKey] = useState<string | null>(key ? atob(decodeURIComponent(key as string)) : null);
   const [isLoading, setIsLoading] = useState(false);
@@ -29,17 +27,20 @@ export default function ClaimDrop() {
   const [errorMsg, setErrorMsg] = useState<string>("");
 
 
+  useEffect(() => {
+    const checkLink = async () => {
+      const isSet = await setAccessKey(secretKey);
+      if (!isSet) {
+        setErrorMsg('Link is invalid or already used');
+      }
+    }
+    if (secretKey) {
+       checkLink()
+    }
+  }, [secretKey]);
   const claim = async () => {
     setIsLoading(true)
     const contractId = 'satisfying-bell.testnet';
-    const isSet = await setAccessKey(secretKey);
-    if (!isSet) {
-      setIsLoading(false)
-      setErrorMsg('link is invalid or already used');
-      return;
-    }
-
-    const DROP_SATS = 546;
     let funderBalance = null;
     let funderTxId = null;
     let dropChange = null;
@@ -96,36 +97,38 @@ export default function ClaimDrop() {
           <CardDescription>Claim your drop using the secret key.</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="space-y-2">
-            <Label >Bitcoin Address</Label>
-            <Input
-              id="bitcoinAddress"
-              value={address}
-              onChange={(e) => setAddress(e.target.value)}
-              placeholder="Enter your Bitcoin address"
-            />
-          </div>
-
-          <div className="flex justify-start mt-3">
-            <Button onClick={claim} disabled={!secretKey || !address || isLoading}  >
-              Claim Drop
-              {isLoading ? (
-                <Loader2 className="animate-spin" />
-              ) : ""}
-            </Button>
-          </div>
-
-          {errorMsg && (
+          {errorMsg ?
             <div>
-              <p>{errorMsg} </p>
+              <p className="text-red ">{errorMsg} </p>
             </div>
-          )}
-          {dropInfo && (
-            <div>
-              <p>Drop ID: </p>
-              <p>Drop Info: {JSON.stringify(dropInfo)}</p>
-            </div>
-          )}
+            : <>
+              <div className="space-y-2">
+                <Label >Bitcoin Address</Label>
+                <Input
+                  id="bitcoinAddress"
+                  value={address}
+                  onChange={(e) => setAddress(e.target.value)}
+                  placeholder="Enter your Bitcoin address"
+                />
+              </div>
+
+              <div className="flex justify-start mt-3">
+                <Button onClick={claim} disabled={!secretKey || !address || isLoading}  >
+                  Claim Drop
+                  {isLoading ? (
+                    <Loader2 className="animate-spin" />
+                  ) : ""}
+                </Button>
+              </div>
+
+              {dropInfo && (
+                <div>
+                  <p>Drop Info: {JSON.stringify(dropInfo)}</p>
+                </div>
+              )}
+
+            </>
+          }
         </CardContent>
       </Card>
     </div>
