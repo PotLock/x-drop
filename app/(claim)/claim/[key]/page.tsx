@@ -35,11 +35,12 @@ export default function ClaimDrop() {
       }
     }
     if (secretKey) {
-       checkLink()
+      checkLink()
     }
   }, [secretKey]);
   const claim = async () => {
     setIsLoading(true)
+    const DROP_SATS = 546;
     const contractId = 'satisfying-bell.testnet';
     let funderBalance = null;
     let funderTxId = null;
