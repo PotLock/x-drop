@@ -7,6 +7,11 @@ dotenv.config();
 function cookiesToArray(cookieString: string): string[] {
     return cookieString.split(";").map(cookie => cookie.trim());
 }
+function delay(time: number) {
+    return new Promise(function (resolve) {
+        setTimeout(resolve, time)
+    });
+}
 
 async function replyToTweet(username: string, tweetId: string, replyMessage: string) {
     const browser = await puppeteer.launch({ headless: true });
@@ -34,21 +39,22 @@ async function replyToTweet(username: string, tweetId: string, replyMessage: str
     await page.waitForSelector('div[data-testid="tweetTextarea_0RichTextInputContainer"]');
 
     await page.click('button[data-testid="tweetButtonInline"]');
+    await delay(3000);
 
     await browser.close();
 }
 
-async function sendDirectMessageOrNotify(scraper: Scraper, recipient: string, message: string, tweetId: string) {
+async function sendDirectMessageOrNotify(scraper: Scraper, conversionId: string, message: string, tweetId: string, username: string) {
     try {
-        await scraper.sendDirectMessage(recipient, message);
-        console.log(`[DM Sent] @${recipient}: ${message}`);
+        await scraper.sendDirectMessage(conversionId, message);
+        console.log(`[DM Sent] @${conversionId}: ${message}`);
     } catch (error: any) {
-        console.error(`[DM Failed] @${recipient}:`, error);
+        console.error(`[DM Failed] @${conversionId}:`, error);
 
         if (error?.errors?.some((e: any) => e.code === 279)) {
-            const replyMessage = `Hey @${recipient}, please send me a DM so I can message you back!`;
-            await scraper.sendTweet(replyMessage, tweetId);
-            console.log(`[Public Reply Sent] Asking @${recipient} to DM first.`);
+            const replyMessage = `Hey @${conversionId}, please send me a DM so I can message you back!`;
+            await replyToTweet(username, tweetId, replyMessage);
+            console.log(`[Public Reply Sent] Asking @${conversionId} to DM first.`);
         }
     }
 }
@@ -122,18 +128,17 @@ async function continuouslyCheckMentions(interval = 60000) {
                     console.log(`[Original Tweet] From @${originalTweet.username}: ${originalTweet.text}`);
 
                     if (originalTweet.username !== userMention) {
-                        const userMentionProfile = await scraper.getProfile(originalTweet.username);
-                        if (!userMentionProfile.isBlueVerified) {
-                            console.log(`[Processing] Reply to tweet ID: ${tweet.id}`);
-                            await replyToTweet(tweet.username, tweet.id, "Cannot send messenger to unverified users");
-                        } else {
-                            const conversionId = `${originalTweet.userId}-${botId}`;
-                            console.log(`[Processing] Send Message to Conversion ID: ${conversionId}`);
-                            await sendDirectMessageOrNotify(scraper, conversionId, "gm", originalTweet.id);
-                        }
+                        const conversionId = `${originalTweet.userId}-${botId}`;
+                        console.log(`[Processing] Send Message to Conversion ID: ${conversionId}`);
+                        // create drop link
+                        // check if user has enough balance
+                        // check if user has already registered
+                        // send drop link
+                        await sendDirectMessageOrNotify(scraper, conversionId, "gm", originalTweet.id, originalTweet.username);
+
                     } else {
                         console.log(`[Processing] Reply to tweet ID: ${tweet.id}`);
-                       // await replyToTweet(tweet.username, tweet.id, "Cannot transfer to yourself");
+                        // await replyToTweet(tweet.username, tweet.id, "Cannot transfer to yourself");
                     }
                 } catch (error) {
                     console.error("[Error] Fetching original tweet:", error);

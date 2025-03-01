@@ -15,19 +15,23 @@ const {
 // GET user by address
 export async function GET(req: NextRequest) {
   const address = req.nextUrl.searchParams.get("address");
-  if (!address) {
-    return NextResponse.json({ error: "Address is required" }, { status: 400 });
-  }
+  const userId = req.nextUrl.searchParams.get("userId");
 
   try {
-    const user = await prisma.user.findUnique({
-      where: {
-        address: address,
-      },
-    });
-    
-    if (!user) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
+    let user;
+    if (address) {
+      user = await prisma.user.findUnique({
+        where: {
+          address: address,
+        },
+      });
+    }
+    if (userId) {
+      user = await prisma.user.findFirst({
+        where: {
+          userId: userId,
+        },
+      });
     }
 
     return NextResponse.json(user);
@@ -41,7 +45,7 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { address } = body;
+    const { address, userId } = body;
 
 
     if (!address) {
@@ -54,7 +58,7 @@ export async function POST(req: NextRequest) {
       path: MPC_PATH,
       chain: 'bitcoin',
     });
-    
+
     // Check if user already exists
     const existingUser = await prisma.user.findUnique({
       where: {
@@ -71,7 +75,8 @@ export async function POST(req: NextRequest) {
       data: {
         address: address,
         btcAddress: btcAddress,
-        btcPublicKey: btcPublicKey
+        btcPublicKey: btcPublicKey,
+        userId: userId,
       } as any,
     });
 
@@ -91,7 +96,7 @@ export async function PUT(req: NextRequest) {
     if (!address) {
       return NextResponse.json({ error: "Address is required" }, { status: 400 });
     }
-    
+
     // Check if user exists
     const existingUser = await prisma.user.findUnique({
       where: {

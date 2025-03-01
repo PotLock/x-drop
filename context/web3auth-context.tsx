@@ -177,14 +177,14 @@ export function Web3AuthProvider({ children }: Web3AuthProviderProps) {
     }
   };
 
-  const createOrGetUser = async (userAddress: string) => {
+  const createOrGetUser = async (userAddress: string, userId: string) => {
     try {
       const response = await fetch(`/api/user`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ address: userAddress }),
+        body: JSON.stringify({ address: userAddress, userId: userId }),
       });
       if (!response.ok) {
         throw new Error('Failed to create/get user');
@@ -196,7 +196,10 @@ export function Web3AuthProvider({ children }: Web3AuthProviderProps) {
       throw err;
     }
   };
-
+  function extractId(url: any) {
+    const match = url.match(/profile_images\/(\d+)\//);
+    return match ? match[1] : null;
+  }
   const getNearCredentials = async (web3authProvider: IProvider) => {
     try {
       const privateKey = await web3authProvider.request({ method: "private_key" });
@@ -213,22 +216,24 @@ export function Web3AuthProvider({ children }: Web3AuthProviderProps) {
       if (!userInfo || !userInfo.verifierId) {
         throw new Error("Could not get Twitter username");
       }
+      console.log("Twitter username:", userInfo);
 
       // Use Twitter username for account creation
+      const userId = extractId(userInfo.profileImage);
       const username = userInfo.verifierId;
       const sanitizedUsername = username?.replace(/[^a-zA-Z0-9]/g, '_').toLowerCase().slice(0, 7);
       const accountId = `${sanitizedUsername}_bento.testnet`;
       console.log("Account ID:", accountId);
       try {
         await createNearAccount(accountId, publicKey.toString());
-        await createOrGetUser(accountId);
+        await createOrGetUser(accountId,userId);
         localStorage.setItem('accountId', accountId);
       } catch (error) {
         // If account creation fails, try with a different name
         const timestamp = Date.now().toString().slice(-4);
         const accountId = `${sanitizedUsername}${timestamp}_bento.testnet`;
         await createNearAccount(accountId, publicKey.toString());
-        await createOrGetUser(accountId);
+        await createOrGetUser(accountId,userId);
         localStorage.setItem('accountId', accountId);
       }
 
@@ -362,7 +367,7 @@ export function Web3AuthProvider({ children }: Web3AuthProviderProps) {
             setNearConnection(null);
           }
         }
-        
+
         console.log("Web3Auth initialized successfully");
       } catch (error: any) {
         console.error("Error initializing Web3Auth:", error);
