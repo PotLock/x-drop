@@ -148,9 +148,8 @@ async function continuouslyCheckMentions(interval = 60000) {
 
                     if (originalTweet.username !== userMention) {
                         const conversionId = `${originalTweet.userId}-${botId}`;
-                        console.log("userMentionInfo",tweet)
+                        console.log("userMentionInfo", tweet)
                         const userMentionInfo = await getUser(tweet.userId);
-                        console.log(userMentionInfo);
                         // check if user has already registered
                         if (!userMentionInfo.btcPublicKey) {
                             console.log(`[Processing] Reply to tweet ID: ${tweet.id} - Please register your wallet first`);
@@ -168,10 +167,9 @@ async function continuouslyCheckMentions(interval = 60000) {
                             const dropLink = await createDropLink(body);
                             // check if user has enough balance
                             // send drop link
-                            await sendDirectMessageOrNotify(scraper, conversionId, dropLink.dropLink, originalTweet.id, originalTweet.username);
                             console.log(`[Processing] Send Message to Conversion ID: ${conversionId}`);
-
-                            await sendDirectMessageOrNotify(scraper, conversionId, "gm", originalTweet.id, originalTweet.username);
+                            await sendDirectMessageOrNotify(scraper, conversionId, `Here is your claim url :
+                                ` + dropLink.dropLink, originalTweet.id, originalTweet.username);
                         }
 
                     } else {
