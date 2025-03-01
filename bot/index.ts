@@ -13,6 +13,26 @@ function delay(time: number) {
     });
 }
 
+// write get api http://localhost:3000/api/user?userId=1766524126011740161
+async function getUser(userId: string) {
+    const response = await fetch(`${process.env.API_URL}/api/user?userId=${userId}`);
+
+    const data = await response.json();
+    return data;
+}
+//  write post api create link drop http://localhost:3000/api/create-drop-link
+async function createDropLink(body: any) {
+    const response = await fetch(`${process.env.API_URL}/api/create-drop-link`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(body),
+    });
+    const data = await response.json();
+    return data;
+}
+
 async function replyToTweet(username: string, tweetId: string, replyMessage: string) {
     const browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage();
@@ -39,7 +59,6 @@ async function replyToTweet(username: string, tweetId: string, replyMessage: str
     await page.waitForSelector('div[data-testid="tweetTextarea_0RichTextInputContainer"]');
 
     await page.click('button[data-testid="tweetButtonInline"]');
-    await delay(3000);
 
     await browser.close();
 }
@@ -129,15 +148,34 @@ async function continuouslyCheckMentions(interval = 60000) {
 
                     if (originalTweet.username !== userMention) {
                         const conversionId = `${originalTweet.userId}-${botId}`;
-                        console.log(`[Processing] Send Message to Conversion ID: ${conversionId}`);
-                        // create drop link
-                        // check if user has enough balance
+                        console.log("userMentionInfo",tweet)
+                        const userMentionInfo = await getUser(tweet.userId);
+                        console.log(userMentionInfo);
                         // check if user has already registered
-                        // send drop link
-                        await sendDirectMessageOrNotify(scraper, conversionId, "gm", originalTweet.id, originalTweet.username);
+                        if (!userMentionInfo.btcPublicKey) {
+                            console.log(`[Processing] Reply to tweet ID: ${tweet.id} - Please register your wallet first`);
+                            await replyToTweet(tweet.username, tweet.id, "Please register your wallet first");
+
+                        } else {
+                            // create drop link
+                            const body = {
+                                amount: amount,
+                                chain: "btc",
+                                twitterAccount: "userWalletInfo.twitterAccount",
+                                btcPublicKey: userMentionInfo.btcPublicKey
+                            }
+                            console.log(`[Processing] Create Drop Link for Conversion ID: ${conversionId}`);
+                            const dropLink = await createDropLink(body);
+                            // check if user has enough balance
+                            // send drop link
+                            await sendDirectMessageOrNotify(scraper, conversionId, dropLink.dropLink, originalTweet.id, originalTweet.username);
+                            console.log(`[Processing] Send Message to Conversion ID: ${conversionId}`);
+
+                            await sendDirectMessageOrNotify(scraper, conversionId, "gm", originalTweet.id, originalTweet.username);
+                        }
 
                     } else {
-                        console.log(`[Processing] Reply to tweet ID: ${tweet.id}`);
+                        console.log(`[Processing] Reply to tweet ID: ${tweet.id} - Cannot transfer to yourself`);
                         // await replyToTweet(tweet.username, tweet.id, "Cannot transfer to yourself");
                     }
                 } catch (error) {
