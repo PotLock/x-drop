@@ -58,9 +58,9 @@ REACT_APP_MPC_PATH="bitcoin-drop,1"
     npm start
     ```
 
-## 6. Setup Bot
+# 6. Setup Bot
 
-1. Go to the [bot](http://_vscodecontentref_/0) folder:
+1. Go to the `bot` folder:
     ```sh
     cd bot
     ```
@@ -68,8 +68,19 @@ REACT_APP_MPC_PATH="bitcoin-drop,1"
     ```sh
     npm install
     ```
-3. Start the bot:
+3. Get Twitter cookies and set the `.env` in the bot folder:
+    - Run the `bot-puppeter.ts` script to log in to Twitter and save cookies.
+    - Copy the cookies from the generated `twitter_cookies.txt` file.
+    - Paste the cookies into the `TWITTER_COOKIES` field in the `.env` file.
+    - Set the following environment variables in the `.env` file:
+        ```properties
+        TWITTER_USERNAME=your_twitter_username
+        TWITTER_PASSWORD=your_twitter_password
+        TWITTER_EMAIL=your_twitter_email
+        TWITTER_COOKIES=your_twitter_cookies
+        API_URL=your_api_url
+        ```
+4. Start the bot:
     ```sh
     npm start
     ```
-
