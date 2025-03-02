@@ -38,6 +38,38 @@
 
 ## Default .env
 
+
 ```properties
 REACT_APP_MPC_PUBLIC_KEY="secp256k1:4NfTiv3UsGahebgTaHyD9vF8KYKMBnfd6kh94mK6xv8fGBiJB8TBtFMP5WWXz6B89Ac1fbpzPwAvoyQebemHFwx3"
 REACT_APP_MPC_PATH="bitcoin-drop,1"
+```
+
+## 4. Install NPM Packages
+
+1. Run the following command to install the necessary npm packages:
+    ```sh
+    npm install
+    ```
+
+## 5. Start Project
+
+1. Run the following command to start the project:
+    ```sh
+    npm start
+    ```
+
+## 6. Setup Bot
+
+1. Go to the [bot](http://_vscodecontentref_/0) folder:
+    ```sh
+    cd bot
+    ```
+2. Install the necessary npm packages:
+    ```sh
+    npm install
+    ```
+3. Start the bot:
+    ```sh
+    npm start
+    ```
+
