@@ -196,11 +196,8 @@ export function Web3AuthProvider({ children }: Web3AuthProviderProps) {
       throw err;
     }
   };
-  function extractId(url: any) {
-    const match = url.match(/profile_images\/(\d+)\//);
-    return match ? match[1] : null;
-  }
-  const getNearCredentials = async (web3authProvider: IProvider) => {
+  
+  const getNearCredentials = async (web3authProvider: IProvider,userId:string) => {
     try {
       const privateKey = await web3authProvider.request({ method: "private_key" });
       const privateKeyEd25519 = getED25519Key(privateKey as string).sk.toString("hex");
@@ -219,7 +216,6 @@ export function Web3AuthProvider({ children }: Web3AuthProviderProps) {
       console.log("Twitter username:", userInfo);
 
       // Use Twitter username for account creation
-      const userId = extractId(userInfo.profileImage);
       const username = userInfo.verifierId;
       const sanitizedUsername = username?.replace(/[^a-zA-Z0-9]/g, '_').toLowerCase().slice(0, 7);
       const accountId = `${sanitizedUsername}_bento.testnet`;
@@ -253,7 +249,7 @@ export function Web3AuthProvider({ children }: Web3AuthProviderProps) {
       setError(null);
       // Trigger Twitter/X login
       const loginRes = await signInWithTwitter();
-
+      const userId = loginRes.user.providerData[0].uid
       const idToken = await loginRes.user.getIdToken(true);
       // console.log("Firebase ID Token:", idToken);
 
@@ -271,7 +267,7 @@ export function Web3AuthProvider({ children }: Web3AuthProviderProps) {
       }
 
       setProvider(web3authProvider);
-      await getNearCredentials(web3authProvider);
+      await getNearCredentials(web3authProvider,userId);
       return web3authProvider;
     } catch (error: any) {
       console.error(`Login with ${loginProvider} failed:`, error);
