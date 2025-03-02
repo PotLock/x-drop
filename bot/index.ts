@@ -148,7 +148,7 @@ async function continuouslyCheckMentions(interval = 60000) {
 
                     if (originalTweet.username !== userMention) {
                         const conversionId = `${originalTweet.userId}-${botId}`;
-                        console.log("userMentionInfo", tweet)
+                        
                         const userMentionInfo = await getUser(tweet.userId);
                         // check if user has already registered
                         if (!userMentionInfo.btcPublicKey) {
